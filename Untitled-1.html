@@ -1,0 +1,232 @@
+                        SS<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>화면접속정보조회</title>
+<%@ include file="/common/include/webdek/head.jsp" %>
+<link rel="stylesheet" type="text/css" href="/common/theme/webdek/css/demo_layout.css">
+<style type="text/css">
+#searchArea::after{
+   content:'';
+   display:block;
+   clear:both;
+}
+#searchArea .inner_search_wrap .detail_table{min-width: 0;}
+</style>
+<script type="text/javascript">
+	$(document).ready(function(){
+		gridList.setGrid({
+	    	id : "gridList", // html에 "gridList"라는 id를 가진것을 선택
+	    	module : "scmcomm", // "scmcomm"폴더에서 
+			command : "SCM_UI_19", // "SCM_UI_19"파일을 가져와, 여기까지가 document를 쓰면 기본으로 들어가 있어야하는 부분
+			itemGrid : "gridList2", // itemGrid는 서브같은 존재라고 생각하면 된다
+			itemSearch : false // head grid 조회 후 자동으로 item grid 조회 되는 옵션, 디트값은 true, false로 주면 자동조회는 되지 않는다?
+
+	    });
+		
+		gridList.setGrid({
+	    	id : "gridList2",
+	    	module : "scmcomm",
+			command : "SCM_UI_19_SUB"
+	    });
+		
+		_COMMONBLIS.configInputSearchAjaxTrigger("searchArea", "USER_ID", "keyup", "USER_ID"); // 기능부분
+		
+		$(".search_next_wrap").css("height","calc(100% - "+($("#searchArea").outerHeight() + 21)+"px)"); // 전체화면에서 여백을 맞춰주는
+	});
+
+	function searchList1(){
+		if(validate.check("searchArea")){
+			var param = inputList.setRangeParam("searchArea");
+
+			gridList.gridList({
+		    	id : "gridList",
+		    	param : param // param : parament
+		    });
+		}
+	}
+	
+	function searchList2(){
+		if(validate.check("searchArea")){
+			var param = inputList.setRangeParam("searchArea");
+
+			gridList.gridList({
+		    	id : "gridList2",
+		    	param : param // 위의 var param = 'inputList.setRangeParam("searchArea")'부분이 적용?
+		    });
+		}
+	}
+	
+	function gridListEventItemGridSearch(gridId, rowNum, itemGridList){
+		if(gridId == "gridList"){
+			var rowData = gridList.getRowData(gridId, rowNum);
+			var param = inputList.setRangeParam("searchArea");
+			param.putAll(rowData);
+			
+			gridList.gridList({
+		    	id : "gridList2",
+		    	param : param
+		    });
+		}
+	}
+
+	function commonBtnClick(btnName){
+		if(btnName == "Search1"){
+			searchList1();
+		}else if(btnName == "Search2"){
+			searchList2();
+		}
+	}
+
+	function searchHelpEventOpenBefore(searchCode, multyType, $inputObj, rowNum){
+		var param = inputList.setRangeDataParam("searchArea");
+		
+		return param;
+	}
+	
+	function searchHelpEventCloseAfter(searchCode, multyType, shRtnData, rowData){
+		return;
+	}
+</script>
+</head>
+<body>
+<%@ include file="/common/include/webdek/layout.jsp" %>
+<!-- content -->
+<div class="content_wrap">
+	<div class="content_inner contentH_inner">
+		<%@ include file="/common/include/webdek/title.jsp" %>
+		<div class="content_serch" id="searchArea">
+			<div class="btn_wrap">
+				<div class="fl_l">
+				</div>
+			</div>
+			<div class="inner_search_wrap content_left" style="box-sizing: border-box;">
+				<table class="detail_table">
+						<col width="100px" />
+						<col/>
+						<col width="100px" />
+						<col/>
+					</colgroup>
+					<tbody>
+						<tr>
+							<th CL="STD_SEARCH_DT">조회일자</th>
+							<td colspan="3">
+								<input class="input" type="text" id="STARTDATE" name="STARTDATE" UIFormat="C N" style="width: 80px;"/>
+								<span>&nbsp;~&nbsp;</span>
+								<input class="input" type="text" id="ENDDATE" name="ENDDATE" UIFormat="C N" style="width: 80px;"/>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="inner_search_wrap content_right" style="box-sizing: border-box;">
+				<table class="detail_table">
+						<col width="100px" />
+						<col/>
+						<col width="100px" />
+						<col/>
+					</colgroup>
+					<tbody >
+						<tr>
+							<th CL="STD_SEARCH_DT">조회일자</th>
+							<td colspan="3">
+								<input class="input" type="text" id="STARTDATE2" name="STARTDATE2" UIFormat="C N" style="width: 80px;"/>
+								<span>&nbsp;~&nbsp;</span>
+								<input class="input" type="text" id="ENDDATE2" name="ENDDATE2" UIFormat="C N" style="width: 80px;"/>
+							</td>
+						</tr>
+						<tr>
+							<th CL="STD_USER_ID"></th>
+							<td colspan="3">
+								<input type="text" class="input" name="USER_ID" UIInput="S,USER_P,text"/>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+        <div class="search_next_wrap">
+			<div class="content-horizontal-wrap">	
+				<div class="content_layout tabs content_left">
+					<ul class="tab tab_style02">
+						<li><a href="#tab1-1"><span>조회결과</span></a></li>
+						<li class="btn_zoom_wrap">
+							<ul>
+								<li><input type="button" CB="Search1 SEARCH BTN_SEARCH" /></li>
+								<li><button class="btn btn_bigger"><span>확대</span></button></li>
+							</ul>
+						</li>
+					</ul>
+					<div class="table_box section" id="tab1-1">
+						<div class="table_list01">
+							<div class="scroll" >
+								<table class="table_c">
+									<tbody id="gridList">
+										<tr CGRow="true">
+											<td GH="40" 				GCol="rownum"						></td>
+											<td GH="120 STD_UP_MENU" 	GCol="text,UP_MENU"			GTA="R"	></td>
+											<td GH="150 STD_MENU" 		GCol="text,MENU"			GTA="C"	></td>
+											<td GH="100 STD_CNT"  		GCol="text,CNT"	  GF="N"	GTA="R"	></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						
+						<div class="btn_lit tableUtil">
+							<button type='button' GBtn="find"></button>
+							<button type='button' GBtn="sortReset"></button>
+							<button type='button' GBtn="total"></button>
+							<button type='button' GBtn="layout"></button>
+							<button type='button' GBtn="excel"></button>
+							<span class='txt_total' >총 건수 : <span GInfoArea='true'>4</span></span>
+						</div>
+					</div>
+				</div>
+				
+				<div class="content_layout tabs content_right">
+					<ul class="tab tab_style02">
+						<li><a href="#tab1-1"><span>조회결과</span></a></li>
+						<li class="btn_zoom_wrap">
+							<ul>
+								<li><input type="button" CB="Search2 SEARCH BTN_SEARCH" /></li>
+								<li><button class="btn btn_bigger"><span>확대</span></button></li>
+							</ul>
+						</li>
+					</ul>
+					<div class="table_box section" id="tab1-1">
+						<div class="table_list01">
+							<div class="scroll">
+								<table class="table_c">
+									<tbody id="gridList2">
+										<tr CGRow="true">
+											<td GH="40"  				GCol="rownum"	        ></td>
+											<td GH="120 STD_UP_MENU_1" 	GCol="text,UP_MENU"			GTA="R"></td>
+											<td GH="150 STD_MENU_1" 	GCol="text,MENU"			GTA="C"></td>
+											<td GH="150" 				GCol="text,USER_NAME"		GTA="C"></td>
+											<td GH="100 STD_CNT"  		GCol="text,CNT"	  GF="N"	GTA="R"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="btn_lit tableUtil">
+							<button type='button' GBtn="find"></button>
+							<button type='button' GBtn="sortReset"></button>
+							<button type='button' GBtn="total"></button>
+							<button type='button' GBtn="layout"></button>
+							<button type='button' GBtn="excel"></button>
+							<span class='txt_total' >총 건수 : <span GInfoArea='true'>4</span></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- // content -->
+<%@ include file="/common/include/webdek/bottom.jsp" %>
+</body>
+</html>
